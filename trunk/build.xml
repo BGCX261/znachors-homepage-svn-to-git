@@ -1,0 +1,77 @@
+<?xml version="1.0"?>
+
+<project name="ZnachorsHomePage" default="run">
+	<property file="build.properties"/>
+	
+	<property name="src" value="${basedir}/src"/>
+	<property name="build" value="${basedir}/build"/>
+	<property name="bin" value="${basedir}/bin"/>
+	<property name="classes" value="${build}/classes"/>
+	<property name="dist" value="${basedir}/dist"/>
+	<property name="lib" value="${basedir}/lib"/>
+	<property name="tomcat" value="${basedir}/tomcat"/>
+	<property name="www" value="${dist}/www"/>
+	<property name="compile.script" value="${basedir}/ZnachorsHomePage-compile.cmd"/>
+	<property name="shell.script" value="${basedir}/ZnachorsHomePage-shell.cmd"/>
+	<property name="reports" value="${basedir}/reports"/>
+		
+	<path id="compile.classpath">
+		<fileset dir="${lib}">
+			<include name="*.jar"/>
+			<include name="*.zip"/>
+		</fileset>
+		<fileset dir="${gwt.home}">
+			<include name="gwt-user.jar"/>
+			<include name="gwt-dev-windows.jar"/>
+		</fileset>
+	</path>
+	
+	<target name="clean">
+		<delete dir="${build}"/>
+		<delete dir="${www}"/>
+		<delete dir="${tomcat}"/>
+		<delete dir="${reports}"/>
+	</target>
+	
+	<target name="init" depends="clean">
+		<mkdir dir="${build}"/>
+		<mkdir dir="${classes}"/>
+		<mkdir dir="${dist}"/>
+		<mkdir dir="${tomcat}"/>
+		<mkdir dir="${www}"/>
+		<mkdir dir="${reports}"/>
+	</target>
+	
+	<target name="compile" depends="init">
+		<javac debug="true" optimize="false" destdir="${classes}"
+			includes="**/*.java">
+			<src path="${src}"/>
+			<classpath>
+				<path refid="compile.classpath"/>
+			</classpath>
+		</javac>
+	</target>
+	
+	<target name="build" depends="compile, test">
+		<exec executable="${compile.script}"/>
+	</target>
+
+	<target name="run" depends="build">
+		<exec executable="${shell.script}"/>
+	</target>
+	
+	<target name="test" depends="compile">
+		<junit fork="yes" printsummary="withOutAndErr">
+			<formatter type="plain" />
+			<batchtest todir="${reports}">
+				<fileset dir="${classes}">
+					<include name="**/*Test.class" />
+				</fileset>
+			</batchtest>
+			<classpath>
+				<path refid="compile.classpath" />
+			</classpath>
+		</junit>
+	</target>
+	
+</project>
